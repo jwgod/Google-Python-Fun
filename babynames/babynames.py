@@ -48,11 +48,18 @@ def extract_names(filename):
   names = re.findall(r'<td>([A-Z][a-z]*)</td>', text)
   ranks = re.findall(r'<td>([0-9]+)</td>', text)
   dic = {}
-  for i in range(0,len(ranks)):
-    dic[names[i*2]] = ranks[i]
-    dic[names[(i*2)+1]] = ranks[i]
-    
+  for i in range(0, len(ranks)):
+    # Due to how the data are stored, all boy names are even indexed while all
+    # girl names are odd indexed
+    # In case of repeated names, the one with lower rank will be stored
+    if names[i*2] not in dic:
+      dic[names[i*2]] = ranks[i]
+    if names[(i*2)+1] not in dic:
+      dic[names[(i*2)+1]] = ranks[i]
+ 
   list_sorted = sorted(dic.items(), key=lambda x: x[0])
+  
+  # Construct the result list
   result = []
   for item in list_sorted:
     result.append(item[0] + ' ' + item[1])
@@ -86,6 +93,6 @@ def main():
   else:
     for arg in args:
       print '\n'.join(extract_names(arg)) + '\n'
-  
+
 if __name__ == '__main__':
   main()
